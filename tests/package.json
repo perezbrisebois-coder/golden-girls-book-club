@@ -1,0 +1,14 @@
+{
+  "name": "tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "npm --prefix ../functions run build && cd .. && firebase emulators:exec --only firestore,auth,functions --project demo-golden-girls \"npm --prefix tests exec vitest run\"",
+    "test:rules": "cd .. && firebase emulators:exec --only firestore --project demo-golden-girls \"npm --prefix tests exec vitest run rules\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "firebase": "^13.1.0",
+    "vitest": "^5.0.5"
+  }
+}
