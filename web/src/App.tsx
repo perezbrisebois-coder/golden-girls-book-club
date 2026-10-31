@@ -5,6 +5,7 @@ import { PasswordPage } from "./pages/PasswordPage";
 import { WhoAreYouPage } from "./pages/WhoAreYouPage";
 import { MeetingPage } from "./pages/MeetingPage";
 import { ComingSoon } from "./pages/ComingSoon";
+import { DatesPage } from "./pages/DatesPage";
 
 export default function App() {
   const { ready, role, memberId, isAdmin } = useSession();
@@ -18,7 +19,7 @@ export default function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<MeetingPage />} />
-          <Route path="dates" element={<ComingSoon title="Pick a Date" />} />
+          <Route path="dates" element={<DatesPage />} />
           <Route path="suggest" element={<ComingSoon title="Suggest a Book or Place" />} />
           <Route path="vote" element={<ComingSoon title="Vote" />} />
           <Route path="comments" element={<ComingSoon title="Comments" />} />

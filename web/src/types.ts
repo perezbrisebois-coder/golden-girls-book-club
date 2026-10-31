@@ -35,3 +35,20 @@ export interface Member {
   hasPin: boolean;
   createdAt?: Timestamp;
 }
+
+export interface Poll {
+  id: string;
+  month: string; // YYYY-MM
+  candidateDates: string[]; // empty = every day of the month
+  note: string;
+  status: "open" | "closed";
+  finalDate: string;
+  createdAt?: Timestamp;
+}
+
+export interface Availability {
+  id: string; // member ID
+  memberId: string;
+  name: string;
+  dates: string[];
+}

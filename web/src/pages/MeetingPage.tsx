@@ -7,6 +7,7 @@ import { api, friendlyError } from "../api";
 import { useConfirm, useToast } from "../components/Feedback";
 import { DecoDivider } from "../components/Deco";
 import { BookCard } from "../components/BookCard";
+import { Field } from "../components/Field";
 import { authorList, formatDate, formatTime, mapsLink } from "../format";
 import type { Meeting, PastMeeting } from "../types";
 
@@ -258,14 +259,3 @@ function MeetingEditor({ meeting, onDone }: { meeting: Meeting | null; onDone: (
   );
 }
 
-function Field({ id, label, hint, children }: { id: string; label: string; hint?: string; children: React.ReactNode }) {
-  return (
-    <div className="field">
-      <label htmlFor={id} className="label">
-        {label}
-      </label>
-      {hint && <p className="hint">{hint}</p>}
-      {children}
-    </div>
-  );
-}

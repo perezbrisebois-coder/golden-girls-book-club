@@ -33,6 +33,11 @@ export const api = {
   archiveMeeting: call<Record<string, never>, { ok: true }>("archiveMeeting"),
   deletePastMeeting: call<{ id: string }, { ok: true }>("deletePastMeeting"),
 
+  openPoll: call<{ month: string; candidateDates: string[]; note: string }, { pollId: string }>("openPoll"),
+  setAvailability: call<{ pollId: string; dates: string[] }, { ok: true }>("setAvailability"),
+  closePoll: call<{ pollId: string; finalDate: string; time: string }, { ok: true }>("closePoll"),
+  reopenPoll: call<{ pollId: string }, { ok: true }>("reopenPoll"),
+
   seedDemo: call<Record<string, never>, { ok: true; members: string[]; pin: string }>("seedDemo"),
 };
 

@@ -451,3 +451,84 @@ input[type="date"].input, input[type="time"].input { color-scheme: dark; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* ---------- Utilities ---------- */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0);
+  white-space: nowrap; border: 0;
+}
+.section-title.flush { margin-top: 0; }
+.unsaved { color: var(--gold-pale); font-style: italic; }
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-height: var(--tap);
+  padding: 0.5rem 0;
+  cursor: pointer;
+}
+.checkbox input { width: 1.6rem; height: 1.6rem; accent-color: var(--gold); flex-shrink: 0; margin-top: 0.1rem; }
+select.input { appearance: auto; }
+
+/* ---------- Calendar ---------- */
+.calendar { margin: 1rem 0; }
+.calendar-month { font-family: var(--font-display); color: var(--gold); font-size: 1.4rem; text-align: center; margin-bottom: 0.5rem; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.3rem; }
+.calendar-weekday { text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; }
+.calendar-weekday abbr { text-decoration: none; }
+.calendar-day {
+  position: relative;
+  min-height: 3.6rem;
+  padding: 0.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: var(--black);
+  color: var(--cream);
+  border: 2px solid var(--gold-deep);
+  border-radius: 8px;
+  font: inherit;
+  cursor: pointer;
+}
+.calendar-day:disabled { cursor: default; }
+.calendar-day.unavailable { border-color: #3a3426; color: #6f6754; background: transparent; }
+.calendar-day-num { font-weight: 700; font-size: 1.05rem; line-height: 1.3; }
+.calendar-check { position: absolute; top: 0.1rem; right: 0.3rem; font-size: 0.85rem; }
+.calendar-count { font-size: 0.7rem; line-height: 1.1; color: var(--muted); }
+.calendar-day.selected { background: var(--gold); color: var(--black); border-color: var(--gold-pale); }
+.calendar-day.selected .calendar-count { color: var(--black); }
+.calendar-day.best:not(.unavailable) { box-shadow: 0 0 0 3px var(--gold-pale); }
+.calendar-day:hover:not(:disabled):not(.selected) { background: var(--surface-2); }
+@media (min-width: 560px) {
+  .calendar-day { min-height: 4.2rem; }
+  .calendar-count { font-size: 0.8rem; }
+}
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; font-size: 0.95rem; color: var(--muted); }
+.legend-swatch { display: inline-block; width: 1.1rem; height: 1.1rem; border-radius: 4px; border: 2px solid var(--gold-deep); margin-left: 0.4rem; }
+.legend-swatch.selected { background: var(--gold); }
+.legend-swatch.best { box-shadow: 0 0 0 3px var(--gold-pale); background: var(--black); }
+
+/* ---------- Availability results ---------- */
+.best-dates {
+  border: 2px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 0.25rem 1rem 0.5rem;
+  background: var(--surface-2);
+  margin-bottom: 1rem;
+}
+.best-dates ul { margin: 0; padding-left: 1.2rem; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--gold-deep); border-radius: var(--radius); margin-bottom: 1rem; }
+.avail-table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+.avail-table th, .avail-table td { padding: 0.45rem 0.5rem; text-align: center; border-bottom: 1px solid #3a3426; white-space: nowrap; }
+.avail-table thead th { color: var(--gold); vertical-align: bottom; }
+.avail-table th[scope="row"] { text-align: left; position: sticky; left: 0; background: var(--surface); z-index: 1; }
+.avail-table thead th:first-child { position: sticky; left: 0; background: var(--surface); z-index: 2; text-align: left; }
+.avail-weekday { display: block; font-size: 0.8rem; font-weight: 400; color: var(--muted); }
+.avail-day { display: block; }
+.avail-table td.yes { color: var(--black); background: var(--gold); font-weight: 700; }
+.avail-table .best { outline: 2px solid var(--gold-pale); outline-offset: -2px; }
+.avail-table tfoot td, .avail-table tfoot th { font-weight: 700; color: var(--gold); border-bottom: none; }

@@ -12,11 +12,11 @@ export async function newClient() {
   const app = initializeApp({ projectId: PROJECT, apiKey: "fake-key" }, `client-${++n}`);
   apps.push(app);
   const auth = getAuth(app);
-  connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+  connectAuthEmulator(auth, "http://127.0.0.1:9199", { disableWarnings: true });
   const fns = getFunctions(app, "us-central1");
-  connectFunctionsEmulator(fns, "127.0.0.1", 5001);
+  connectFunctionsEmulator(fns, "127.0.0.1", 5101);
   const db = getFirestore(app);
-  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  connectFirestoreEmulator(db, "127.0.0.1", 8180);
   await signInAnonymously(auth);
 
   const call = async <T = any>(name: string, data: unknown = {}): Promise<T> =>
@@ -40,7 +40,7 @@ export async function cleanupClients() {
 }
 
 export async function clearData() {
-  await fetch(`http://127.0.0.1:8080/emulator/v1/projects/${PROJECT}/databases/(default)/documents`, { method: "DELETE" });
+  await fetch(`http://127.0.0.1:8180/emulator/v1/projects/${PROJECT}/databases/(default)/documents`, { method: "DELETE" });
 }
 
 /** Expects a callable to fail with the given Firebase code (e.g. "permission-denied"). */
