@@ -1,4 +1,13 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "elections",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "candidateKeys", "arrayConfig": "CONTAINS" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

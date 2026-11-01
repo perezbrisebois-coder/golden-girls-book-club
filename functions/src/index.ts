@@ -8,3 +8,15 @@ export { enterPassword, identifyMember, switchMember, adminClearPin, adminRemove
 export { updateMeeting, archiveMeeting, deletePastMeeting } from "./meeting";
 export { seedDemo } from "./seed";
 export { openPoll, setAvailability, closePoll, reopenPoll } from "./polls";
+export {
+  searchBooks,
+  getBookReview,
+  searchPlaces,
+  getPlaceReview,
+  proposeBook,
+  proposePlace,
+  editProposalNote,
+  withdrawProposal,
+  adminRemoveProposal,
+  refreshProposalReview,
+} from "./suggestions";

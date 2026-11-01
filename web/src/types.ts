@@ -52,3 +52,68 @@ export interface Availability {
   name: string;
   dates: string[];
 }
+
+export interface Source {
+  title: string;
+  url: string;
+}
+
+export interface BookReview {
+  overall: string;
+  criticSentiment: string;
+  readerSentiment: string;
+  praise: string[];
+  criticism: string[];
+  disagreements: string;
+  genre: string;
+  pageCount: number | null;
+  sources: Source[];
+}
+
+export interface PlaceReview {
+  overall: string;
+  priceRange: string;
+  noise: string;
+  parking: string;
+  accessibility: string;
+  groups: string;
+  praise: string[];
+  criticism: string[];
+  sources: Source[];
+}
+
+export interface BookCandidate {
+  key: string;
+  title: string;
+  authors: string[];
+  year: string;
+  coverUrl: string;
+  description: string;
+  pageCount: number | null;
+  isbn: string;
+}
+
+export interface PlaceInfo {
+  key: string;
+  name: string;
+  address: string;
+  city: string;
+  phone: string;
+  website: string;
+  description: string;
+  isPrivate?: boolean;
+}
+
+export interface Proposal {
+  id: string;
+  key: string;
+  kind: "book" | "place";
+  book?: BookCandidate;
+  place?: PlaceInfo;
+  review: BookReview | PlaceReview | null;
+  proposerId: string;
+  proposerName: string;
+  note: string;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}

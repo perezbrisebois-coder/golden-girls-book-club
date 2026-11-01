@@ -20,7 +20,7 @@ const READABLE = [
   "elections/e1",
   "comments/c1",
 ];
-const SECRET = ["memberSecrets/m1", "ballots/x1", "bookCache/q1", "reviewCache/r1", "rateLimits/k1", "somethingElse/z"];
+const SECRET = ["memberSecrets/m1", "ballots/x1", "bookSearchCache/q1", "placeSearchCache/q1", "reviewCache/r1", "rateLimits/k1", "somethingElse/z"];
 
 beforeAll(async () => {
   env = await initializeTestEnvironment({

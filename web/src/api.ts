@@ -1,9 +1,9 @@
 import { httpsCallable } from "firebase/functions";
 import { functions } from "./firebase";
-import type { BookInfo, Role } from "./types";
+import type { BookCandidate, BookInfo, BookReview, PlaceInfo, PlaceReview, Role } from "./types";
 
-function call<Req, Res>(name: string) {
-  const fn = httpsCallable<Req, Res>(functions, name);
+function call<Req, Res>(name: string, timeoutMs = 70_000) {
+  const fn = httpsCallable<Req, Res>(functions, name, { timeout: timeoutMs });
   return async (data: Req): Promise<Res> => (await fn(data)).data;
 }
 
@@ -38,12 +38,31 @@ export const api = {
   closePoll: call<{ pollId: string; finalDate: string; time: string }, { ok: true }>("closePoll"),
   reopenPoll: call<{ pollId: string }, { ok: true }>("reopenPoll"),
 
+  // AI lookups can take up to a few minutes
+  searchBooks: call<{ query: string }, { candidates: BookCandidate[]; searchedFor: string }>("searchBooks", 240_000),
+  getBookReview: call<{ book: { title: string; authors: string[]; year: string } }, { review: BookReview | null; unavailable: boolean }>(
+    "getBookReview",
+    240_000,
+  ),
+  searchPlaces: call<{ query: string }, { candidates: PlaceInfo[]; unavailable: boolean }>("searchPlaces", 240_000),
+  getPlaceReview: call<{ place: PlaceInfo }, { review: PlaceReview | null; unavailable: boolean }>("getPlaceReview", 240_000),
+  proposeBook: call<{ book: BookCandidate; note: string }, { key: string }>("proposeBook"),
+  proposePlace: call<{ place: Omit<PlaceInfo, "key">; note: string; isPrivate: boolean }, { key: string }>("proposePlace"),
+  editProposalNote: call<{ key: string; note: string }, { ok: true }>("editProposalNote"),
+  withdrawProposal: call<{ key: string }, { ok: true }>("withdrawProposal"),
+  adminRemoveProposal: call<{ key: string }, { ok: true }>("adminRemoveProposal"),
+  refreshProposalReview: call<{ key: string }, { ok: true; unavailable: boolean }>("refreshProposalReview", 240_000),
+
   seedDemo: call<Record<string, never>, { ok: true; members: string[]; pin: string }>("seedDemo"),
 };
 
 /** Turns a Firebase error into a sentence suitable for showing to members. */
 export function friendlyError(err: unknown): string {
   const e = err as { code?: string; message?: string };
+  if (e?.code === "functions/deadline-exceeded") {
+    return "That took too long. Please try again.";
+  }
+  if (e?.code === "functions/unavailable" && e.message && e.message !== "unavailable") return e.message;
   if (e?.code === "functions/internal" || e?.code === "functions/unavailable") {
     return "Something went wrong on our end. Please try again in a moment.";
   }
