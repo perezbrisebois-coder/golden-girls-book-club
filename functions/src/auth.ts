@@ -1,7 +1,8 @@
 import { onCall, HttpsError } from "firebase-functions/https";
 import { getAuth } from "firebase-admin/auth";
 import { FieldValue } from "firebase-admin/firestore";
-import { ADMIN_PASSWORD, MEMBER_PASSWORD } from "./lib/secrets";
+import { ADMIN_PASSWORD, BALLOT_KEY, MEMBER_PASSWORD } from "./lib/secrets";
+import { ballotId } from "./elections";
 import { clientIp, db, nameKey, requireAdmin, requireRole, str, type Role } from "./lib/common";
 import { hashPin, isValidPin, safeEqual, verifyPin } from "./lib/pin";
 import { assertNotLocked, clearFailures, recordFailure, type Limit } from "./lib/rateLimit";
@@ -124,10 +125,11 @@ export const adminClearPin = onCall(async (req) => {
 });
 
 /**
- * Admin: remove a member. Their profile, PIN and date-poll selections are
- * deleted. Comments and proposals keep the name they were posted under.
+ * Admin: remove a member. Their profile, PIN, date-poll selections and
+ * ballots in open votes are deleted. Comments and proposals keep the name
+ * they were posted under; closed votes keep their published counts.
  */
-export const adminRemoveMember = onCall(async (req) => {
+export const adminRemoveMember = onCall({ secrets: [BALLOT_KEY] }, async (req) => {
   requireAdmin(req);
   const memberId = str(req.data?.memberId, "member", { max: 128, required: true });
   const batch = db().batch();
@@ -135,6 +137,11 @@ export const adminRemoveMember = onCall(async (req) => {
   batch.delete(db().collection("memberSecrets").doc(memberId));
   const availability = await db().collectionGroup("availability").where("memberId", "==", memberId).get();
   availability.docs.forEach((d) => batch.delete(d.ref));
+  const openVotes = await db().collection("elections").where("status", "==", "open").get();
+  for (const e of openVotes.docs) {
+    batch.delete(db().collection("ballots").doc(ballotId(e.id, memberId)));
+    batch.update(e.ref, { [`voters.${memberId}`]: FieldValue.delete() });
+  }
   await batch.commit();
   return { ok: true };
 });

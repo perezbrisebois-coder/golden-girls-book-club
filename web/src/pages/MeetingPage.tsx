@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { collection, doc, orderBy, query } from "firebase/firestore";
+import { collection, doc, limit, orderBy, query } from "firebase/firestore";
 import { firestore } from "../firebase";
 import { useCollection, useDoc } from "../hooks";
 import { useSession } from "../session";
@@ -9,10 +9,12 @@ import { DecoDivider } from "../components/Deco";
 import { BookCard } from "../components/BookCard";
 import { Field } from "../components/Field";
 import { authorList, formatDate, formatTime, mapsLink } from "../format";
-import type { Meeting, PastMeeting } from "../types";
+import type { Election, Meeting, PastMeeting, Proposal } from "../types";
 
 const meetingRef = doc(firestore, "config", "meeting");
 const pastQuery = query(collection(firestore, "pastMeetings"), orderBy("date", "desc"));
+const proposalsQuery = query(collection(firestore, "proposals"), orderBy("createdAt", "desc"));
+const recentVotesQuery = query(collection(firestore, "elections"), orderBy("createdAt", "desc"), limit(12));
 
 export function MeetingPage() {
   const { isAdmin } = useSession();
@@ -61,7 +63,7 @@ export function MeetingPage() {
       <DecoDivider />
 
       {editing ? (
-        <MeetingEditor meeting={meeting} onDone={() => setEditing(false)} />
+        <MeetingEditor meeting={meeting} past={past} onDone={() => setEditing(false)} />
       ) : (
         <>
           <div className="card meeting-card">
@@ -150,7 +152,7 @@ export function MeetingPage() {
   );
 }
 
-function MeetingEditor({ meeting, onDone }: { meeting: Meeting | null; onDone: () => void }) {
+function MeetingEditor({ meeting, past, onDone }: { meeting: Meeting | null; past: PastMeeting[]; onDone: () => void }) {
   const toast = useToast();
   const [form, setForm] = useState({
     date: meeting?.date ?? "",
@@ -159,6 +161,8 @@ function MeetingEditor({ meeting, onDone }: { meeting: Meeting | null; onDone: (
     address: meeting?.address ?? "",
     mapUrl: meeting?.mapUrl ?? "",
     notes: meeting?.notes ?? "",
+    bookKey: meeting?.book?.key ?? "",
+    bookYear: meeting?.book?.year ?? "",
     bookTitle: meeting?.book?.title ?? "",
     bookAuthors: authorList(meeting?.book?.authors),
     bookCover: meeting?.book?.coverUrl ?? "",
@@ -166,6 +170,42 @@ function MeetingEditor({ meeting, onDone }: { meeting: Meeting | null; onDone: (
   });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const { data: proposals } = useCollection<Proposal>(proposalsQuery, "proposals-all");
+  const { data: recentVotes } = useCollection<Election>(recentVotesQuery, "elections");
+  // Books already read at a past meeting aren't offered again.
+  const readBefore = new Set(past.map((p) => p.book?.key).filter(Boolean));
+  const books = proposals.filter((p) => p.kind === "book" && p.book && !readBefore.has(p.key));
+  const places = proposals.filter((p) => p.kind === "place" && p.place);
+  // Latest vote each suggestion won, e.g. "won the vote: Next book".
+  const wonVote = new Map<string, string>();
+  for (const v of recentVotes) {
+    if (v.status === "closed" && v.results?.winner && !wonVote.has(v.results.winner)) wonVote.set(v.results.winner, v.title);
+  }
+  const optionLabel = (p: Proposal, main: string) => (wonVote.has(p.key) ? `★ ${main} (won the vote: ${wonVote.get(p.key)})` : main);
+  // Vote winners first.
+  const byWinner = (a: Proposal, b: Proposal) => Number(wonVote.has(b.key)) - Number(wonVote.has(a.key));
+
+  function pickBook(key: string) {
+    const b = books.find((p) => p.key === key)?.book;
+    if (!b) return;
+    setForm((f) => ({
+      ...f,
+      bookKey: key,
+      bookYear: b.year ?? "",
+      bookTitle: b.title,
+      bookAuthors: authorList(b.authors),
+      bookCover: b.coverUrl ?? "",
+      bookDescription: b.description ?? "",
+    }));
+  }
+
+  function pickPlace(key: string) {
+    const p = places.find((x) => x.key === key)?.place;
+    if (!p) return;
+    const address = p.city && !p.address.toLowerCase().includes(p.city.toLowerCase()) ? [p.address, p.city].filter(Boolean).join(", ") : p.address;
+    setForm((f) => ({ ...f, locationName: p.name, address, mapUrl: "" }));
+  }
+
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
@@ -174,7 +214,6 @@ function MeetingEditor({ meeting, onDone }: { meeting: Meeting | null; onDone: (
     setBusy(true);
     setError("");
     try {
-      const keepBook = meeting?.book && meeting.book.title === form.bookTitle.trim() ? meeting.book : null;
       await api.updateMeeting({
         date: form.date,
         time: form.time,
@@ -184,8 +223,8 @@ function MeetingEditor({ meeting, onDone }: { meeting: Meeting | null; onDone: (
         notes: form.notes,
         book: form.bookTitle.trim()
           ? {
-              key: keepBook?.key ?? "",
-              year: keepBook?.year ?? "",
+              key: form.bookKey,
+              year: form.bookYear,
               title: form.bookTitle,
               authors: form.bookAuthors.split(",").map((a) => a.trim()).filter(Boolean),
               coverUrl: form.bookCover,
@@ -212,6 +251,18 @@ function MeetingEditor({ meeting, onDone }: { meeting: Meeting | null; onDone: (
           <input id="m-time" className="input" type="time" value={form.time} onChange={set("time")} />
         </Field>
       </div>
+      {places.length > 0 && (
+        <Field id="m-pick-place" label="Choose from the suggested places" hint="This fills in the place name and address below.">
+          <select id="m-pick-place" className="input" value="" onChange={(e) => pickPlace(e.target.value)}>
+            <option value="">Pick a suggested place…</option>
+            {[...places].sort(byWinner).map((p) => (
+              <option key={p.key} value={p.key}>
+                {optionLabel(p, p.place!.name)}
+              </option>
+            ))}
+          </select>
+        </Field>
+      )}
       <Field id="m-place" label="Place name" hint='For example "Rose&apos;s house" or "Main Street Library"'>
         <input id="m-place" className="input" value={form.locationName} onChange={set("locationName")} />
       </Field>
@@ -226,11 +277,38 @@ function MeetingEditor({ meeting, onDone }: { meeting: Meeting | null; onDone: (
       </Field>
 
       <h3 className="section-label">Book</h3>
+      {books.length > 0 && (
+        <Field
+          id="m-pick-book"
+          label="Choose from the recommended books"
+          hint="The book that won the vote is marked with ★. Choosing one fills in the details below."
+        >
+          <select
+            id="m-pick-book"
+            className="input"
+            value={books.some((p) => p.key === form.bookKey) ? form.bookKey : ""}
+            onChange={(e) => pickBook(e.target.value)}
+          >
+            <option value="">{form.bookKey || !form.bookTitle ? "Pick a recommended book…" : "Typed in by hand"}</option>
+            {[...books].sort(byWinner).map((p) => (
+              <option key={p.key} value={p.key}>
+                {optionLabel(p, `${p.book!.title} by ${authorList(p.book!.authors)}`)}
+              </option>
+            ))}
+          </select>
+        </Field>
+      )}
       <p className="hint">
-        Usually the book comes from the vote. You can also type it in here. Leave the title empty if it isn't chosen yet.
+        {books.length > 0 ? "Or type the book in yourself. " : "Type the book in here. "}Leave the title empty if it isn't chosen
+        yet.
       </p>
       <Field id="m-title" label="Book title">
-        <input id="m-title" className="input" value={form.bookTitle} onChange={set("bookTitle")} />
+        <input
+          id="m-title"
+          className="input"
+          value={form.bookTitle}
+          onChange={(e) => setForm((f) => ({ ...f, bookTitle: e.target.value, bookKey: "", bookYear: "" }))}
+        />
       </Field>
       <Field id="m-authors" label="Author(s)" hint="Separate several authors with commas.">
         <input id="m-authors" className="input" value={form.bookAuthors} onChange={set("bookAuthors")} />

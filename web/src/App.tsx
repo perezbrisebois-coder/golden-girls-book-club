@@ -5,6 +5,7 @@ import { PasswordPage } from "./pages/PasswordPage";
 import { WhoAreYouPage } from "./pages/WhoAreYouPage";
 import { MeetingPage } from "./pages/MeetingPage";
 import { ComingSoon } from "./pages/ComingSoon";
+import { VotePage } from "./pages/VotePage";
 import { DatesPage } from "./pages/DatesPage";
 import { SuggestPage } from "./pages/SuggestPage";
 
@@ -22,7 +23,7 @@ export default function App() {
           <Route index element={<MeetingPage />} />
           <Route path="dates" element={<DatesPage />} />
           <Route path="suggest" element={<SuggestPage />} />
-          <Route path="vote" element={<ComingSoon title="Vote" />} />
+          <Route path="vote" element={<VotePage />} />
           <Route path="comments" element={<ComingSoon title="Comments" />} />
           {isAdmin && <Route path="members" element={<ComingSoon title="Manage Members" />} />}
           <Route path="*" element={<Navigate to="/" replace />} />

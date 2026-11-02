@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/https";
 import { FieldValue } from "firebase-admin/firestore";
 import { db, isoDate, optionalUrl, requireAdmin, str, time24 } from "./lib/common";
+import { bookKey } from "./lib/bookSources";
 
 export interface BookInfo {
   key: string;
@@ -13,6 +14,16 @@ export interface BookInfo {
 
 export const meetingRef = () => db().collection("config").doc("meeting");
 
+/** IDs of every book chosen for the next meeting or a past meeting. */
+export async function booksChosenForMeetings(): Promise<Set<string>> {
+  const [meeting, past] = await Promise.all([meetingRef().get(), db().collection("pastMeetings").get()]);
+  const keys = new Set<string>();
+  for (const book of [meeting.get("book"), ...past.docs.map((d) => d.get("book"))]) {
+    if (book?.title) keys.add(bookKey(book.title, book.authors ?? []));
+  }
+  return keys;
+}
+
 export function parseBook(raw: unknown): BookInfo | null {
   if (raw === null || raw === undefined) return null;
   if (typeof raw !== "object") throw new HttpsError("invalid-argument", "Book details are invalid.");
@@ -23,7 +34,9 @@ export function parseBook(raw: unknown): BookInfo | null {
     ? b.authors.slice(0, 10).map((a) => str(a, "author", { max: 200 })).filter(Boolean)
     : [];
   return {
-    key: str(b.key, "book key", { max: 200 }),
+    // Same ID as the recommendation list uses, so a book chosen for a meeting
+    // (picked from the list or typed in) can be left off future votes.
+    key: bookKey(title, authors),
     title,
     authors,
     coverUrl: optionalUrl(b.coverUrl, "cover image address"),

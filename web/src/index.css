@@ -631,3 +631,99 @@ select.input { appearance: auto; }
 .review-offer p {
   margin: 0;
 }
+
+/* ---------- Vote ---------- */
+.center-row { justify-content: center; margin: 0 0 1.5rem; }
+.stack-gap { margin-bottom: 1.5rem; }
+.election { display: grid; gap: 1rem; margin-bottom: 1.5rem; }
+.election-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.election-header .badge { margin-left: 0; }
+.ballot { display: grid; gap: 0.5rem; }
+.success-notice { border-color: var(--success); }
+.success-notice strong { color: var(--success); }
+.help-link { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px; }
+.help-link > span[aria-hidden] {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  font-weight: 700;
+  text-decoration: none;
+}
+.empty-ranking { border: 1px dashed var(--gold-deep); border-radius: var(--radius); padding: 0.75rem 1rem; color: var(--muted); }
+.rank-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
+.rank-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+  padding: 0.7rem 0.9rem;
+  border: 2px solid var(--gold-deep);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+.unranked .rank-item { border-style: dashed; border-width: 1px; background: transparent; }
+.rank-number {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--black);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+}
+.rank-label { flex: 1 1 12rem; min-width: 0; display: flex; flex-direction: column; }
+.rank-title { font-weight: 700; color: var(--gold-pale); }
+.rank-sub { color: var(--muted); font-size: 0.95rem; }
+.rank-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.rank-actions .btn-small { min-height: 44px; }
+.voters { border-top: 1px solid #3a3426; padding-top: 0.75rem; }
+.voters p { margin-bottom: 0.4rem; }
+
+.explainer { border: 1px solid var(--gold-deep); border-radius: var(--radius); padding: 0 1rem; background: var(--surface-2); scroll-margin-top: 1rem; }
+.explainer > summary { cursor: pointer; min-height: 48px; display: flex; align-items: center; font-weight: 700; color: var(--gold); }
+.explainer-body { padding-bottom: 1rem; }
+.explainer-steps { padding-left: 1.4rem; margin: 0 0 0.75rem; }
+.explainer-steps li { margin-bottom: 0.4rem; }
+.explainer-heading { font-family: var(--font-deco); color: var(--gold); font-size: 1.15rem; margin: 1.25rem 0 0.5rem; }
+.example-ballots { list-style: none; padding: 0; margin: 0 0 0.75rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.25rem 1rem; }
+.example-round { border-left: 3px solid var(--gold-deep); padding-left: 0.9rem; margin-bottom: 1rem; }
+.example-round-title { font-weight: 700; margin-bottom: 0.35rem; }
+.example-bar { display: grid; grid-template-columns: 6rem auto 1fr; align-items: center; gap: 0.75rem; min-height: 2rem; }
+.example-name { font-weight: 700; }
+.example-dots { color: var(--gold); letter-spacing: 0.15em; font-size: 1.2rem; }
+.example-count { color: var(--muted); font-size: 0.95rem; }
+.example-bar.is-out .example-name { text-decoration: line-through; color: var(--muted); }
+.example-bar.is-out .example-dots { color: var(--muted); }
+.example-bar.is-winner .example-name, .example-bar.is-winner .example-count { color: var(--gold-pale); font-weight: 700; }
+
+.winner { text-align: center; }
+.winner-label { font-family: var(--font-deco); color: var(--gold); font-size: 1.3rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.winner .book-card { text-align: left; }
+.winner-place { display: grid; justify-items: center; gap: 0.25rem; }
+.rounds { display: grid; gap: 0.5rem; }
+.round-story { padding-left: 1.4rem; margin: 0 0 0.5rem; }
+.round-story li { margin-bottom: 0.5rem; }
+.rounds-table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+.rounds-table th, .rounds-table td { padding: 0.5rem 0.6rem; text-align: center; border-bottom: 1px solid #3a3426; white-space: nowrap; }
+.rounds-table thead th { color: var(--gold); }
+.rounds-table th[scope="row"] { text-align: left; white-space: normal; min-width: 9rem; position: sticky; left: 0; background: var(--surface); }
+.rounds-table tr.is-winner th[scope="row"] { color: var(--gold-pale); }
+.rounds-table td.is-winner { background: var(--gold); color: var(--black); font-weight: 700; }
+.rounds-table td.is-out { color: var(--danger); }
+.rounds-table .cell-note { font-size: 0.8rem; }
+.rounds-table .exhausted-row th, .rounds-table .exhausted-row td { color: var(--muted); font-style: italic; border-bottom: none; }
+.past-votes > summary { cursor: pointer; min-height: 48px; display: flex; align-items: center; font-weight: 700; color: var(--gold); margin-bottom: 0.75rem; }
+.fieldset { border: none; padding: 0; margin: 0; }
+.rounds-table thead th:first-child { text-align: left; position: sticky; left: 0; background: var(--surface); }
+.how-to-vote { border: 2px solid var(--gold-deep); border-radius: var(--radius); background: var(--surface-2); padding: 0.9rem 1.1rem 0.5rem; }
+.how-to-vote-title { font-family: var(--font-deco); color: var(--gold); font-size: 1.3rem; margin-bottom: 0.4rem; }
+.how-to-vote ol { margin: 0 0 0.5rem; padding-left: 1.4rem; }
+.how-to-vote li { margin-bottom: 0.35rem; }
+.how-to-vote-foot { border-top: 1px solid #3a3426; padding-top: 0.5rem; margin: 0; }
+.my-vote { margin: 0 0 0.5rem; padding-left: 1.6rem; font-weight: 700; color: var(--gold-pale); } .my-vote li { margin-bottom: 0.25rem; }

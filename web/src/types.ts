@@ -117,3 +117,42 @@ export interface Proposal {
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 }
+
+export interface ElectionCandidate {
+  key: string;
+  label: string;
+  sublabel: string;
+  coverUrl: string;
+  book?: BookInfo;
+  place?: PlaceInfo;
+}
+
+export type TieBreakMethod = "earlier-round" | "ranked-lower" | "random";
+
+export interface TallyRound {
+  counts: { key: string; votes: number }[];
+  exhausted: number;
+  eliminated: string | null;
+  winner: string | null;
+  tieBreak: { tied: string[]; method: TieBreakMethod } | null;
+}
+
+export interface TallyResult {
+  winner: string | null;
+  totalBallots: number;
+  rounds: TallyRound[];
+}
+
+export interface Election {
+  id: string;
+  kind: "book" | "place";
+  title: string;
+  candidates: ElectionCandidate[];
+  candidateKeys: string[];
+  status: "open" | "closed";
+  /** memberId → name of everyone who has voted (never their choices). */
+  voters: Record<string, string>;
+  results: TallyResult | null;
+  createdAt?: Timestamp;
+  closedAt?: Timestamp;
+}

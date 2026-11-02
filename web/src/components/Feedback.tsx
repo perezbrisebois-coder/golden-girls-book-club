@@ -91,7 +91,7 @@ function ConfirmDialog({
   return (
     <dialog ref={ref} className="dialog" onCancel={() => onClose(false)} aria-labelledby="confirm-title">
       <h2 id="confirm-title">{title}</h2>
-      {message && <p>{message}</p>}
+      {message && <p className="pre-line">{message}</p>}
       <div className="button-row">
         <button type="button" className="btn btn-secondary" onClick={() => onClose(false)} autoFocus>
           No, go back

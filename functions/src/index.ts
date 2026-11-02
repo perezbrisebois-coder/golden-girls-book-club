@@ -20,3 +20,11 @@ export {
   adminRemoveProposal,
   refreshProposalReview,
 } from "./suggestions";
+export {
+  openElection,
+  submitBallot,
+  getMyBallot,
+  closeElection,
+  reopenElection,
+  deleteElection,
+} from "./elections";

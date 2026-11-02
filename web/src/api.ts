@@ -53,6 +53,13 @@ export const api = {
   adminRemoveProposal: call<{ key: string }, { ok: true }>("adminRemoveProposal"),
   refreshProposalReview: call<{ key: string }, { ok: true; unavailable: boolean }>("refreshProposalReview", 240_000),
 
+  openElection: call<{ kind: "book" | "place"; title: string; candidateKeys: string[] }, { electionId: string }>("openElection"),
+  submitBallot: call<{ electionId: string; ranking: string[] }, { ok: true }>("submitBallot"),
+  getMyBallot: call<{ electionId: string }, { ranking: string[] }>("getMyBallot"),
+  closeElection: call<{ electionId: string }, { ok: true }>("closeElection"),
+  reopenElection: call<{ electionId: string }, { ok: true }>("reopenElection"),
+  deleteElection: call<{ electionId: string }, { ok: true }>("deleteElection"),
+
   seedDemo: call<Record<string, never>, { ok: true; members: string[]; pin: string }>("seedDemo"),
 };
 
