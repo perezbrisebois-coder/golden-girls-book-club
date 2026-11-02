@@ -5,7 +5,7 @@ initializeApp();
 setGlobalOptions({ region: "us-central1", maxInstances: 10 });
 
 export { enterPassword, identifyMember, switchMember, adminClearPin, adminRemoveMember } from "./auth";
-export { updateMeeting, archiveMeeting, deletePastMeeting } from "./meeting";
+export { updateMeeting, archiveMeeting, addPastMeeting, deletePastMeeting } from "./meeting";
 export { seedDemo } from "./seed";
 export { openPoll, setAvailability, closePoll, reopenPoll } from "./polls";
 export {
@@ -28,3 +28,4 @@ export {
   reopenElection,
   deleteElection,
 } from "./elections";
+export { postComment, editComment, deleteComment, pinComment } from "./comments";

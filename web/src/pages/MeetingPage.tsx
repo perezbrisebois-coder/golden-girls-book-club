@@ -21,6 +21,7 @@ export function MeetingPage() {
   const { data: meeting, loading } = useDoc<Meeting>(meetingRef, "meeting");
   const { data: past } = useCollection<PastMeeting>(pastQuery, "past");
   const [editing, setEditing] = useState(false);
+  const [addingPast, setAddingPast] = useState(false);
   const toast = useToast();
   const confirm = useConfirm();
 
@@ -124,9 +125,20 @@ export function MeetingPage() {
         </>
       )}
 
-      {past.length > 0 && (
+      {(past.length > 0 || isAdmin) && (
         <>
           <h2 className="section-title">Past Meetings</h2>
+          {isAdmin &&
+            (addingPast ? (
+              <PastMeetingForm onDone={() => setAddingPast(false)} />
+            ) : (
+              <div className="button-row past-add">
+                <button type="button" className="btn btn-secondary" onClick={() => setAddingPast(true)}>
+                  + Add a past meeting
+                </button>
+              </div>
+            ))}
+          {past.length === 0 && !addingPast && <p className="muted">No past meetings recorded yet.</p>}
           <ul className="past-list">
             {past.map((p) => (
               <li key={p.id} className="past-item">
@@ -135,6 +147,7 @@ export function MeetingPage() {
                   {p.book && p.book.authors.length > 0 && <p className="muted">by {authorList(p.book.authors)}</p>}
                   <p className="muted">
                     {formatDate(p.date)}
+                    {p.time && ` at ${formatTime(p.time)}`}
                     {p.locationName && ` · ${p.locationName}`}
                   </p>
                 </div>
@@ -337,3 +350,104 @@ function MeetingEditor({ meeting, past, onDone }: { meeting: Meeting | null; pas
   );
 }
 
+
+/** Admin: record a meeting that already happened. */
+function PastMeetingForm({ onDone }: { onDone: () => void }) {
+  const toast = useToast();
+  const { data: proposals } = useCollection<Proposal>(proposalsQuery, "proposals-all");
+  const books = proposals.filter((p) => p.kind === "book" && p.book);
+  const [form, setForm] = useState({ date: "", time: "", locationName: "", address: "", title: "", authors: "", coverUrl: "", description: "", year: "" });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  function pickBook(key: string) {
+    const b = books.find((p) => p.key === key)?.book;
+    if (b) {
+      setForm((f) => ({ ...f, title: b.title, authors: authorList(b.authors), coverUrl: b.coverUrl ?? "", description: b.description ?? "", year: b.year ?? "" }));
+    }
+  }
+
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    if (!form.date) return setError("Please enter the date of the meeting.");
+    setBusy(true);
+    setError("");
+    try {
+      await api.addPastMeeting({
+        date: form.date,
+        time: form.time,
+        locationName: form.locationName,
+        address: form.address,
+        book: form.title.trim()
+          ? {
+              key: "",
+              title: form.title,
+              authors: form.authors.split(",").map((a) => a.trim()).filter(Boolean),
+              coverUrl: form.coverUrl,
+              description: form.description,
+              year: form.year,
+            }
+          : null,
+      });
+      toast("Past meeting added!");
+      onDone();
+    } catch (err) {
+      setError(friendlyError(err));
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form className="card form" onSubmit={save} noValidate>
+      <h3 className="section-title flush">Add a past meeting</h3>
+      <p className="hint">For a meeting that already happened. Its book won't be offered in future votes.</p>
+      <div className="form-grid">
+        <Field id="pm-date" label="Date">
+          <input id="pm-date" className="input" type="date" value={form.date} onChange={set("date")} max={new Date().toISOString().slice(0, 10)} />
+        </Field>
+        <Field id="pm-time" label="Time (optional)">
+          <input id="pm-time" className="input" type="time" value={form.time} onChange={set("time")} />
+        </Field>
+      </div>
+      <Field id="pm-place" label="Place name (optional)">
+        <input id="pm-place" className="input" value={form.locationName} onChange={set("locationName")} />
+      </Field>
+      <Field id="pm-address" label="Address (optional)">
+        <input id="pm-address" className="input" value={form.address} onChange={set("address")} />
+      </Field>
+      {books.length > 0 && (
+        <Field id="pm-pick" label="Choose from the recommended books" hint="Or type the book in below.">
+          <select id="pm-pick" className="input" value="" onChange={(e) => pickBook(e.target.value)}>
+            <option value="">Pick a recommended book…</option>
+            {books.map((p) => (
+              <option key={p.key} value={p.key}>
+                {p.book!.title} by {authorList(p.book!.authors)}
+              </option>
+            ))}
+          </select>
+        </Field>
+      )}
+      <Field id="pm-title" label="Book title">
+        <input id="pm-title" className="input" value={form.title} onChange={set("title")} />
+      </Field>
+      <Field id="pm-authors" label="Author(s)" hint="Separate several authors with commas.">
+        <input id="pm-authors" className="input" value={form.authors} onChange={set("authors")} />
+      </Field>
+      {error && (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      )}
+      <div className="button-row">
+        <button type="button" className="btn btn-secondary" onClick={onDone} disabled={busy}>
+          Cancel
+        </button>
+        <button type="submit" className="btn btn-primary" disabled={busy}>
+          {busy ? "Saving…" : "Add past meeting"}
+        </button>
+      </div>
+    </form>
+  );
+}

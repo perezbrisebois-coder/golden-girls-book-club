@@ -26,6 +26,7 @@ export interface PastMeeting {
   date: string;
   time: string;
   locationName: string;
+  address?: string;
   book: BookInfo | null;
 }
 
@@ -155,4 +156,16 @@ export interface Election {
   results: TallyResult | null;
   createdAt?: Timestamp;
   closedAt?: Timestamp;
+}
+
+export interface Comment {
+  id: string;
+  authorId: string;
+  authorName: string;
+  text: string;
+  /** Top-level comment this replies to (one level of replies), or null. */
+  parentId: string | null;
+  pinned: boolean;
+  createdAt?: Timestamp;
+  editedAt?: Timestamp | null;
 }

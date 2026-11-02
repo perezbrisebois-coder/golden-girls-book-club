@@ -79,12 +79,33 @@ export const archiveMeeting = onCall(async (req) => {
       date: m.date,
       time: m.time ?? "",
       locationName: m.locationName ?? "",
+      address: m.address ?? "",
       book: m.book ?? null,
       archivedAt: FieldValue.serverTimestamp(),
     });
     tx.update(meetingRef(), { date: "", time: "", book: null, notes: "", updatedAt: FieldValue.serverTimestamp() });
   });
   return { ok: true };
+});
+
+/** Admin: record a meeting that already happened (e.g. one held before the app existed). */
+export const addPastMeeting = onCall(async (req) => {
+  requireAdmin(req);
+  const d = req.data ?? {};
+  const date = isoDate(d.date, "the meeting date", true);
+  if (date > new Date().toISOString().slice(0, 10)) {
+    throw new HttpsError("invalid-argument", "That date is in the future. Use Edit meeting details for the next meeting.");
+  }
+  const ref = db().collection("pastMeetings").doc();
+  await ref.create({
+    date,
+    time: time24(d.time, "the meeting time"),
+    locationName: str(d.locationName, "the place name", { max: 200 }),
+    address: str(d.address, "the address", { max: 500 }),
+    book: parseBook(d.book),
+    archivedAt: FieldValue.serverTimestamp(),
+  });
+  return { id: ref.id };
 });
 
 /** Admin: delete an entry from Past Meetings. */

@@ -727,3 +727,28 @@ select.input { appearance: auto; }
 .how-to-vote li { margin-bottom: 0.35rem; }
 .how-to-vote-foot { border-top: 1px solid #3a3426; padding-top: 0.5rem; margin: 0; }
 .my-vote { margin: 0 0 0.5rem; padding-left: 1.6rem; font-weight: 700; color: var(--gold-pale); } .my-vote li { margin-bottom: 0.25rem; }
+.past-add { margin: 0 0 1rem; }
+
+/* ---------- Comments ---------- */
+.composer { margin-bottom: 1.5rem; }
+.flush-top { margin-top: 0; }
+.button-row.tight { margin-top: 0.5rem; }
+.comment-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
+.comment.is-pinned { border-width: 2px; border-color: var(--gold); }
+.pinned-label { color: var(--gold); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.25rem; }
+.comment-meta { margin-bottom: 0.25rem; }
+.comment-author { color: var(--gold-pale); }
+.comment-text { white-space: pre-line; overflow-wrap: anywhere; margin-bottom: 0.5rem; }
+.comment-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.comment-actions .btn-small { min-height: 44px; }
+.reply-list { list-style: none; margin: 1rem 0 0; padding: 0 0 0 1rem; border-left: 2px solid var(--gold-deep); display: grid; gap: 1rem; }
+.reply-form { display: grid; gap: 0.25rem; }
+
+/* ---------- Manage members ---------- */
+.member-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem; }
+.member-item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; padding: 0.9rem 1.1rem; }
+.member-item .button-row { margin-top: 0; }
+.member-info { min-width: 0; }
+.member-info p { margin: 0; }
+.member-name { font-weight: 700; font-size: 1.15rem; color: var(--gold-pale); }
+.pin-cleared { color: var(--gold); font-style: italic; }

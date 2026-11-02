@@ -31,6 +31,10 @@ export const api = {
     { ok: true }
   >("updateMeeting"),
   archiveMeeting: call<Record<string, never>, { ok: true }>("archiveMeeting"),
+  addPastMeeting: call<
+    { date: string; time: string; locationName: string; address: string; book: BookInfo | null },
+    { id: string }
+  >("addPastMeeting"),
   deletePastMeeting: call<{ id: string }, { ok: true }>("deletePastMeeting"),
 
   openPoll: call<{ month: string; candidateDates: string[]; note: string }, { pollId: string }>("openPoll"),
@@ -59,6 +63,11 @@ export const api = {
   closeElection: call<{ electionId: string }, { ok: true }>("closeElection"),
   reopenElection: call<{ electionId: string }, { ok: true }>("reopenElection"),
   deleteElection: call<{ electionId: string }, { ok: true }>("deleteElection"),
+
+  postComment: call<{ text: string; parentId?: string }, { id: string }>("postComment"),
+  editComment: call<{ id: string; text: string }, { ok: true }>("editComment"),
+  deleteComment: call<{ id: string }, { ok: true }>("deleteComment"),
+  pinComment: call<{ id: string; pinned: boolean }, { ok: true }>("pinComment"),
 
   seedDemo: call<Record<string, never>, { ok: true; members: string[]; pin: string }>("seedDemo"),
 };

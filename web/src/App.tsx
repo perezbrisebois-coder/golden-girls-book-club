@@ -4,7 +4,8 @@ import { Layout } from "./components/Layout";
 import { PasswordPage } from "./pages/PasswordPage";
 import { WhoAreYouPage } from "./pages/WhoAreYouPage";
 import { MeetingPage } from "./pages/MeetingPage";
-import { ComingSoon } from "./pages/ComingSoon";
+import { CommentsPage } from "./pages/CommentsPage";
+import { MembersPage } from "./pages/MembersPage";
 import { VotePage } from "./pages/VotePage";
 import { DatesPage } from "./pages/DatesPage";
 import { SuggestPage } from "./pages/SuggestPage";
@@ -24,8 +25,8 @@ export default function App() {
           <Route path="dates" element={<DatesPage />} />
           <Route path="suggest" element={<SuggestPage />} />
           <Route path="vote" element={<VotePage />} />
-          <Route path="comments" element={<ComingSoon title="Comments" />} />
-          {isAdmin && <Route path="members" element={<ComingSoon title="Manage Members" />} />}
+          <Route path="comments" element={<CommentsPage />} />
+          {isAdmin && <Route path="members" element={<MembersPage />} />}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
