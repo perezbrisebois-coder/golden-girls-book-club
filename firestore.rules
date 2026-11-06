@@ -38,6 +38,12 @@ service cloud.firestore {
     match /comments/{commentId} {
       allow read: if isClubMember();
     }
+    match /potlucks/{potluckId} {
+      allow read: if isClubMember();
+      match /items/{itemId} {
+        allow read: if isClubMember();
+      }
+    }
 
     // Everything else is denied by default.
   }

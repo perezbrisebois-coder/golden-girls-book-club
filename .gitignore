@@ -7,3 +7,4 @@ ui-debug.log*
 .firebase/
 .env.local
 .emulator-data/
+firebase-export-*/

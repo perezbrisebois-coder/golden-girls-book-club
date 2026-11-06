@@ -69,6 +69,15 @@ export const api = {
   deleteComment: call<{ id: string }, { ok: true }>("deleteComment"),
   pinComment: call<{ id: string; pinned: boolean }, { ok: true }>("pinComment"),
 
+  openPotluck: call<{ date: string; notes: string }, { id: string }>("openPotluck"),
+  updatePotluck: call<{ id: string; notes?: string; status?: "open" | "closed" }, { ok: true }>("updatePotluck"),
+  deletePotluck: call<{ id: string }, { ok: true }>("deletePotluck"),
+  addPotluckItem: call<{ potluckId: string; dish: string; category: string; note: string }, { id: string }>("addPotluckItem"),
+  editPotluckItem: call<{ potluckId: string; id: string; dish: string; category: string; note: string }, { ok: true }>(
+    "editPotluckItem",
+  ),
+  deletePotluckItem: call<{ potluckId: string; id: string }, { ok: true }>("deletePotluckItem"),
+
   seedDemo: call<Record<string, never>, { ok: true; members: string[]; pin: string }>("seedDemo"),
 };
 

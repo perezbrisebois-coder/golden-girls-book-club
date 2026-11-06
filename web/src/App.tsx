@@ -5,6 +5,7 @@ import { PasswordPage } from "./pages/PasswordPage";
 import { WhoAreYouPage } from "./pages/WhoAreYouPage";
 import { MeetingPage } from "./pages/MeetingPage";
 import { CommentsPage } from "./pages/CommentsPage";
+import { PotluckPage } from "./pages/PotluckPage";
 import { MembersPage } from "./pages/MembersPage";
 import { VotePage } from "./pages/VotePage";
 import { DatesPage } from "./pages/DatesPage";
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="dates" element={<DatesPage />} />
           <Route path="suggest" element={<SuggestPage />} />
           <Route path="vote" element={<VotePage />} />
+          <Route path="potluck" element={<PotluckPage />} />
           <Route path="comments" element={<CommentsPage />} />
           {isAdmin && <Route path="members" element={<MembersPage />} />}
           <Route path="*" element={<Navigate to="/" replace />} />

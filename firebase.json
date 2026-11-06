@@ -12,7 +12,10 @@
         ".git",
         "*.log",
         "src",
-        "**/*.test.*"
+        "**/*.test.*",
+        ".secret.local",
+        ".env.demo-*",
+        ".env.local"
       ],
       "predeploy": [
         "npm --prefix \"$RESOURCE_DIR\" run build"

@@ -155,7 +155,7 @@ input[type="date"].input, input[type="time"].input { color-scheme: dark; }
 
 .form { display: grid; gap: 0.25rem; }
 .field { margin-bottom: 0.5rem; }
-.form-grid { display: grid; gap: 0 1rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
+.form-grid { display: grid; gap: 0 1rem; grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr)); }
 
 .error {
   color: var(--danger);
@@ -271,7 +271,7 @@ input[type="date"].input, input[type="time"].input { color-scheme: dark; }
   bottom: 0;
   z-index: 20;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   background: var(--black);
   border-top: 2px solid var(--gold-deep);
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -285,11 +285,13 @@ input[type="date"].input, input[type="time"].input { color-scheme: dark; }
   padding: 0.3rem 0.1rem;
   color: var(--cream);
   text-decoration: none;
-  font-size: 0.85rem; /* 15.3px on phones so 5 labels fit; still bold & high contrast */
+  /* 14.4px on most phones; shrinks on narrow screens or large default text so 6 labels always fit */
+  font-size: min(0.8rem, 3.7vw);
   font-weight: 700;
   border-top: 4px solid transparent;
 }
 .tab-icon { font-size: 1.35rem; line-height: 1.1; color: var(--gold-deep); }
+.tab-label-short { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tab-label-long { display: none; }
 .tab.active { color: var(--gold); border-top-color: var(--gold); background: var(--surface-2); }
 .tab.active .tab-icon { color: var(--gold); }
@@ -591,10 +593,10 @@ select.input { appearance: auto; }
 }
 .review-details[open] > summary { margin-bottom: 0.5rem; }
 .review { border-top: 1px solid #3a3426; padding-top: 0.75rem; }
-.review-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.5rem 1rem; margin: 0 0 0.75rem; }
+.review-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr)); gap: 0.5rem 1rem; margin: 0 0 0.75rem; }
 .review-facts dt { color: var(--gold); font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.06em; }
 .review-facts dd { margin: 0; }
-.review-lists { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0 1.5rem; }
+.review-lists { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr)); gap: 0 1.5rem; }
 .review-lists ul { margin: 0 0 0.75rem; padding-left: 1.2rem; }
 .review-lists .section-label { margin-top: 0.25rem; }
 .sources ul { padding-left: 1.2rem; margin: 0 0 0.5rem; }
@@ -635,7 +637,7 @@ select.input { appearance: auto; }
 /* ---------- Vote ---------- */
 .center-row { justify-content: center; margin: 0 0 1.5rem; }
 .stack-gap { margin-bottom: 1.5rem; }
-.election { display: grid; gap: 1rem; margin-bottom: 1.5rem; }
+.election { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
 .election-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
 .election-header .badge { margin-left: 0; }
 .ballot { display: grid; gap: 0.5rem; }
@@ -691,7 +693,7 @@ select.input { appearance: auto; }
 .explainer-steps { padding-left: 1.4rem; margin: 0 0 0.75rem; }
 .explainer-steps li { margin-bottom: 0.4rem; }
 .explainer-heading { font-family: var(--font-deco); color: var(--gold); font-size: 1.15rem; margin: 1.25rem 0 0.5rem; }
-.example-ballots { list-style: none; padding: 0; margin: 0 0 0.75rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.25rem 1rem; }
+.example-ballots { list-style: none; padding: 0; margin: 0 0 0.75rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr)); gap: 0.25rem 1rem; }
 .example-round { border-left: 3px solid var(--gold-deep); padding-left: 0.9rem; margin-bottom: 1rem; }
 .example-round-title { font-weight: 700; margin-bottom: 0.35rem; }
 .example-bar { display: grid; grid-template-columns: 6rem auto 1fr; align-items: center; gap: 0.75rem; min-height: 2rem; }
@@ -752,3 +754,16 @@ select.input { appearance: auto; }
 .member-info p { margin: 0; }
 .member-name { font-weight: 700; font-size: 1.15rem; color: var(--gold-pale); }
 .pin-cleared { color: var(--gold); font-style: italic; }
+
+/* ---------- Potluck ---------- */
+.potluck-mine { list-style: none; padding: 0; margin: 0 0 0.75rem; display: grid; gap: 0.5rem; }
+.potluck-mine-item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid #3a3426; }
+.potluck-mine-item .button-row { margin: 0; }
+.potluck-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); gap: 0.5rem 1.5rem; }
+.potluck-category { font-family: var(--font-deco); color: var(--gold); font-size: 1.15rem; margin: 0.5rem 0 0.25rem; }
+.potluck-items { list-style: none; padding: 0; margin: 0; }
+.potluck-items li { padding: 0.3rem 0; border-bottom: 1px dotted #3a3426; }
+.potluck-dish { font-weight: 700; color: var(--gold-pale); }
+.potluck-note { color: var(--muted); font-style: italic; }
+.potluck-remove { margin-left: 0.5rem; min-height: 44px; }
+.potluck-notes-edit { flex-basis: 100%; }

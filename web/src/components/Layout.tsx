@@ -10,7 +10,8 @@ const TABS = [
   { to: "/dates", label: "Dates", long: "Pick a Date", icon: "▦" },
   { to: "/suggest", label: "Suggest", long: "Suggest", icon: "❦" },
   { to: "/vote", label: "Vote", long: "Vote", icon: "✓" },
-  { to: "/comments", label: "Comments", long: "Comments", icon: "❝" },
+  { to: "/potluck", label: "Potluck", long: "Potluck", icon: "♨" },
+  { to: "/comments", label: "Chat", long: "Comments", icon: "❝" },
 ];
 
 export function Layout() {

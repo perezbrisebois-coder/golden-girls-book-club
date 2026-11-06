@@ -19,6 +19,8 @@ const READABLE = [
   "proposals/b1",
   "elections/e1",
   "comments/c1",
+  "potlucks/p1",
+  "potlucks/p1/items/i1",
 ];
 const SECRET = ["memberSecrets/m1", "ballots/x1", "bookSearchCache/q1", "placeSearchCache/q1", "reviewCache/r1", "rateLimits/k1", "somethingElse/z"];
 

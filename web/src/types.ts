@@ -169,3 +169,22 @@ export interface Comment {
   createdAt?: Timestamp;
   editedAt?: Timestamp | null;
 }
+
+export interface Potluck {
+  id: string;
+  date: string; // YYYY-MM-DD meeting date
+  notes: string;
+  status: "open" | "closed";
+  createdAt?: Timestamp;
+}
+
+export interface PotluckItem {
+  id: string;
+  memberId: string;
+  name: string;
+  dish: string;
+  category: string;
+  note: string;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
