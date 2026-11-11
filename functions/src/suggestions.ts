@@ -1,7 +1,7 @@
 import { onCall, HttpsError, type CallableRequest } from "firebase-functions/https";
 import { FieldValue } from "firebase-admin/firestore";
 import { db, optionalUrl, requireAdmin, requireMember, sha256, str } from "./lib/common";
-import { bookKey, normalize, searchBooks as lookupBooks, type BookCandidate } from "./lib/bookSources";
+import { bookKey, normalize, searchBooks as lookupBooks, searchOpenLibrary, type BookCandidate } from "./lib/bookSources";
 import { useAiQuota } from "./lib/aiQuota";
 import {
   ANTHROPIC_API_KEY,
@@ -109,6 +109,18 @@ export const searchBooksWeb = onCall(AI_OPTS, async (req): Promise<WebBookSearch
         source: "web",
       });
     }
+    // Add a cover, page count and ISBN from Open Library when it has the same book.
+    // (Skipped with the offline test provider.)
+    if (process.env.REVIEW_PROVIDERS !== "fake") await Promise.all(
+      candidates.map(async (c) => {
+        const match = (await searchOpenLibrary(`${c.title} ${c.authors[0]}`).catch(() => [])).find((m) => m.key === c.key);
+        if (!match) return;
+        c.coverUrl = match.coverUrl;
+        c.pageCount = match.pageCount;
+        c.isbn = match.isbn;
+        c.year ||= match.year;
+      }),
+    );
     const result = { candidates, unavailable: false };
     if (candidates.length) await store("bookWebSearchCache", cacheId, result, { query });
     return result;

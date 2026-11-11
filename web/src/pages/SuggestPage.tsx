@@ -86,8 +86,6 @@ function BookFlow({ existing, onDone }: { existing: Map<string, Proposal>; onDon
   const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<BookCandidate[] | null>(null);
   const [searchedFor, setSearchedFor] = useState("");
-  const [lastQuery, setLastQuery] = useState("");
-  const [webState, setWebState] = useState<"idle" | "searching" | "done" | "unavailable">("idle");
   const [chosen, setChosen] = useState<BookCandidate | null>(null);
   const [review, setReview] = useState<BookReview | null>(null);
   const [reviewState, setReviewState] = useState<"idle" | "loading" | "done" | "unavailable">("idle");
@@ -101,32 +99,22 @@ function BookFlow({ existing, onDone }: { existing: Map<string, Proposal>; onDon
     setChosen(null);
     if (q.trim().length < 2) return setError("Please type a title, an author, or both.");
     setSearching(true);
-    setWebState("idle");
-    setLastQuery(q.trim());
     try {
-      const res = await api.searchBooks({ query: q });
-      setResults(res.candidates);
-      setSearchedFor(res.searchedFor);
+      // Search the whole internet first (finds brand-new and upcoming books too);
+      // fall back to the book catalogs if internet search is unavailable.
+      const web = await api.searchBooksWeb({ query: q }).catch(() => null);
+      if (web && !web.unavailable) {
+        setResults(web.candidates);
+        setSearchedFor("");
+      } else {
+        const res = await api.searchBooks({ query: q });
+        setResults(res.candidates);
+        setSearchedFor(res.searchedFor);
+      }
     } catch (err) {
       setError(friendlyError(err));
     } finally {
       setSearching(false);
-    }
-  }
-
-  /** "Search the whole internet": finds brand-new or unusual books the catalogs don't have. */
-  async function searchWeb() {
-    setError("");
-    setWebState("searching");
-    try {
-      const res = await api.searchBooksWeb({ query: lastQuery });
-      if (res.unavailable) return setWebState("unavailable");
-      setResults(res.candidates);
-      setSearchedFor("");
-      setWebState("done");
-    } catch (err) {
-      setError(friendlyError(err));
-      setWebState("idle");
     }
   }
 
@@ -232,27 +220,18 @@ function BookFlow({ existing, onDone }: { existing: Map<string, Proposal>; onDon
           </div>
         </Field>
       </form>
-      {searching && <p className="hint">Searching the book catalogs…</p>}
+      {searching && <p className="hint">Searching the internet for that book… This can take up to 30 seconds.</p>}
       {error && (
         <p className="error" role="alert">
           {error}
         </p>
       )}
-      {results && !searching && webState !== "searching" && (
+      {results && !searching && (
         <>
           {results.length === 0 ? (
-            <p>
-              {webState === "done"
-                ? "We couldn't find that book on the internet either. Try adding the author's name, or check the title."
-                : "We couldn't find that book in the catalogs."}
-            </p>
+            <p>We couldn't find that book. Try adding the author's name, or check the title.</p>
           ) : (
             <>
-              {webState === "done" && (
-                <p className="notice">
-                  We searched the internet for <strong>{lastQuery}</strong>. These may be new or upcoming books.
-                </p>
-              )}
               {searchedFor && (
                 <p className="notice">
                   We didn't find an exact match, so we searched for <strong>{searchedFor}</strong>.
@@ -274,23 +253,8 @@ function BookFlow({ existing, onDone }: { existing: Map<string, Proposal>; onDon
               </ul>
             </>
           )}
-          {webState === "idle" && (
-            <div className="notice">
-              <p>
-                <strong>{results.length ? "Don't see your book?" : "Is it a new book?"}</strong> We can search the whole
-                internet, which finds brand-new and upcoming books too. It takes up to 30 seconds.
-              </p>
-              <button type="button" className="btn btn-primary" onClick={searchWeb}>
-                Search the whole internet
-              </button>
-            </div>
-          )}
-          {webState === "unavailable" && (
-            <p className="notice">Internet search isn't available right now. Please try again later.</p>
-          )}
         </>
       )}
-      {webState === "searching" && <p>Searching the internet for that book… This can take up to 30 seconds.</p>}
       <div className="button-row">
         <button type="button" className="btn btn-secondary" onClick={onDone}>
           Cancel
