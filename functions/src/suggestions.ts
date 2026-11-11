@@ -13,7 +13,9 @@ import {
 } from "./reviews";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const SEARCH_CACHE_MS = 30 * DAY_MS;
+const SEARCH_CACHE_MS = 30 * DAY_MS; // places
+/** Book searches are kept briefly so newly published books show up quickly. */
+const BOOK_SEARCH_CACHE_MS = 1 * DAY_MS;
 const REVIEW_CACHE_MS = 90 * DAY_MS;
 /** AI calls with web search can take a while. */
 const AI_OPTS = { secrets: [ANTHROPIC_API_KEY], timeoutSeconds: 240, memory: "512MiB" as const };
@@ -48,7 +50,7 @@ export const searchBooks = onCall(AI_OPTS, async (req): Promise<BookSearchResult
   const query = str(req.data?.query, "a title or author", { max: 200, required: true });
   if (query.length < 2) throw new HttpsError("invalid-argument", "Please type a bit more of the title or author.");
   const cacheId = sha256(normalize(query));
-  const hit = await cached<BookSearchResult>("bookSearchCache", cacheId, SEARCH_CACHE_MS);
+  const hit = await cached<BookSearchResult>("bookSearchCache", cacheId, BOOK_SEARCH_CACHE_MS);
   if (hit) return hit;
 
   let result: BookSearchResult;
@@ -71,6 +73,49 @@ export const searchBooks = onCall(AI_OPTS, async (req): Promise<BookSearchResult
   }
   if (result.candidates.length) await store("bookSearchCache", cacheId, result, { query });
   return result;
+});
+
+type WebBookSearchResult = { candidates: BookCandidate[]; unavailable: boolean };
+
+/**
+ * "Search the whole internet": AI web search for any real book, including
+ * brand-new and upcoming titles the catalogs don't list yet.
+ */
+export const searchBooksWeb = onCall(AI_OPTS, async (req): Promise<WebBookSearchResult> => {
+  const { memberId } = await requireMember(req);
+  const query = str(req.data?.query, "a title or author", { max: 200, required: true });
+  if (query.length < 2) throw new HttpsError("invalid-argument", "Please type a bit more of the title or author.");
+  const cacheId = sha256(normalize(query));
+  const hit = await cached<WebBookSearchResult>("bookWebSearchCache", cacheId, BOOK_SEARCH_CACHE_MS);
+  if (hit) return hit;
+  await useAiQuota(memberId);
+  try {
+    const found = await withProviders((p) => p.findBooks(query));
+    const seen = new Set<string>();
+    const candidates: BookCandidate[] = [];
+    for (const b of found) {
+      const key = bookKey(b.title, b.authors);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      candidates.push({
+        key,
+        title: b.title.slice(0, 300),
+        authors: b.authors.slice(0, 5).map((a) => a.slice(0, 200)),
+        year: /^\d{4}$/.test(b.year) ? b.year : "",
+        coverUrl: "",
+        description: b.description.slice(0, 1500),
+        pageCount: null,
+        isbn: "",
+        source: "web",
+      });
+    }
+    const result = { candidates, unavailable: false };
+    if (candidates.length) await store("bookWebSearchCache", cacheId, result, { query });
+    return result;
+  } catch (err) {
+    if (err instanceof ProviderUnavailableError) return { candidates: [], unavailable: true };
+    throw err;
+  }
 });
 
 function parseBookQuery(raw: unknown) {

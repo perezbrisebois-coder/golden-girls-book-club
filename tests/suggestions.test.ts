@@ -127,6 +127,17 @@ describe("place suggestions", () => {
     await expectCode(rose.call("refreshProposalReview", { key }), "failed-precondition");
   });
 
+  it("finds new books by searching the internet, and they can be posted", async () => {
+    const { rose } = await setup();
+    const { candidates, unavailable } = await rose.call("searchBooksWeb", { query: "Partita" });
+    expect(unavailable).toBe(false);
+    expect(candidates[0]).toMatchObject({ title: "Partita (web)", authors: ["Web Author"], year: "2026", source: "web" });
+    const { key } = await rose.call("proposeBook", { book: candidates[0], note: "Brand new!" });
+    expect((await getDoc(doc(rose.db, "proposals", key))).get("book.title")).toBe("Partita (web)");
+    expect(await rose.call("searchBooksWeb", { query: "nothing at all" })).toEqual({ candidates: [], unavailable: false });
+    expect(await rose.call("searchBooksWeb", { query: "unavailable book" })).toEqual({ candidates: [], unavailable: true });
+  });
+
   it("returns unavailable instead of an error when the AI is down", async () => {
     const { rose } = await setup();
     expect(await rose.call("searchPlaces", { query: "unavailable cafe" })).toEqual({ candidates: [], unavailable: true });

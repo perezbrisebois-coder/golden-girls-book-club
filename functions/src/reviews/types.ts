@@ -28,6 +28,14 @@ export interface BookReview {
   sources: Source[];
 }
 
+/** A book found by searching the web (for titles the catalogs don't have yet). */
+export interface WebBook {
+  title: string;
+  authors: string[];
+  year: string; // publication year, or "" if unknown
+  description: string; // 1-3 plain sentences about the book
+}
+
 export interface PlaceCandidate {
   name: string;
   address: string; // street address
@@ -54,6 +62,8 @@ export interface ReviewProvider {
   /** Fixes spelling / fills in a vague book search, e.g. "chemestry garmus" -> ["Lessons in Chemistry by Bonnie Garmus"]. */
   suggestBookSearches(query: string): Promise<string[]>;
   summarizeBook(book: BookQuery): Promise<BookReview>;
+  /** Web search for books, including brand-new and upcoming titles the catalogs don't list yet. */
+  findBooks(query: string): Promise<WebBook[]>;
   findPlaces(query: string): Promise<PlaceCandidate[]>;
   summarizePlace(place: PlaceCandidate): Promise<PlaceReview>;
 }

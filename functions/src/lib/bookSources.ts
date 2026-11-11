@@ -9,7 +9,7 @@ export interface BookCandidate {
   description: string;
   pageCount: number | null;
   isbn: string;
-  source: "google" | "openlibrary";
+  source: "google" | "openlibrary" | "web";
   workId?: string; // Open Library work ID, e.g. OL123W
 }
 

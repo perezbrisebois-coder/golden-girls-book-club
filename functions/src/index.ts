@@ -10,6 +10,7 @@ export { seedDemo } from "./seed";
 export { openPoll, setAvailability, closePoll, reopenPoll } from "./polls";
 export {
   searchBooks,
+  searchBooksWeb,
   getBookReview,
   searchPlaces,
   getPlaceReview,

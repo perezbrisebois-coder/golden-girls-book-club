@@ -48,6 +48,7 @@ export const api = {
     "getBookReview",
     240_000,
   ),
+  searchBooksWeb: call<{ query: string }, { candidates: BookCandidate[]; unavailable: boolean }>("searchBooksWeb", 240_000),
   searchPlaces: call<{ query: string }, { candidates: PlaceInfo[]; unavailable: boolean }>("searchPlaces", 240_000),
   getPlaceReview: call<{ place: PlaceInfo }, { review: PlaceReview | null; unavailable: boolean }>("getPlaceReview", 240_000),
   proposeBook: call<{ book: BookCandidate; note: string }, { key: string }>("proposeBook"),

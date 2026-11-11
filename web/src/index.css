@@ -767,3 +767,7 @@ select.input { appearance: auto; }
 .potluck-note { color: var(--muted); font-style: italic; }
 .potluck-remove { margin-left: 0.5rem; min-height: 44px; }
 .potluck-notes-edit { flex-basis: 100%; }
+
+/* Who are you? — tap-your-name list */
+.name-pick { list-style: none; padding: 0; margin: 0.75rem 0 1rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.5rem; max-height: 22rem; overflow-y: auto; }
+.name-pick-btn { width: 100%; min-height: 3rem; font-size: 1.1rem; }

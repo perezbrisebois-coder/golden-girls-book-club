@@ -1,4 +1,4 @@
-import type { BookQuery, BookReview, PlaceCandidate, PlaceReview, ReviewProvider } from "./types";
+import type { BookQuery, BookReview, PlaceCandidate, PlaceReview, ReviewProvider, WebBook } from "./types";
 import { ProviderUnavailableError } from "./types";
 
 /**
@@ -26,6 +26,12 @@ export class FakeProvider implements ReviewProvider {
       pageCount: 320,
       sources: [{ title: "Example review", url: "https://example.com/review" }],
     };
+  }
+
+  async findBooks(query: string): Promise<WebBook[]> {
+    if (/unavailable/i.test(query)) throw new ProviderUnavailableError("simulated outage");
+    if (/nothing/i.test(query)) return [];
+    return [{ title: `${query} (web)`, authors: ["Web Author"], year: "2026", description: "Found on the web." }];
   }
 
   async findPlaces(query: string): Promise<PlaceCandidate[]> {

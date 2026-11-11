@@ -39,7 +39,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           }
           return;
         }
-        const token = await u.getIdTokenResult();
+        let token;
+        try {
+          token = await u.getIdTokenResult();
+        } catch (e) {
+          // A saved session that can no longer be refreshed (e.g. deleted account):
+          // start over with a fresh one instead of hanging on "Loading…".
+          console.error("Saved session is no longer valid; starting a new one", e);
+          await signOut(auth).catch(() => undefined);
+          return;
+        }
         const role = token.claims.role === "admin" || token.claims.role === "member" ? token.claims.role : null;
         const memberId = typeof token.claims.memberId === "string" ? token.claims.memberId : null;
         setUser(u);
